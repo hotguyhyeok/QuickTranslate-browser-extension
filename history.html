@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>번역 기록 — Quick Translate</title>
+  <link rel="stylesheet" href="history.css">
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <h1><img src="icons/tuxt.png" class="logo-img" alt="">번역 기록</h1>
+      <div class="header-right">
+        <button id="quizBtn" class="btn-primary">플래시카드</button>
+        <button id="clearBtn" class="btn-ghost">전체 삭제</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input type="search" id="searchInput" class="search-input" placeholder="검색...">
+      <select id="sortSelect" class="sort-select">
+        <option value="recent">최신순</option>
+        <option value="frequency">빈도순</option>
+        <option value="alpha">가나다순</option>
+      </select>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">전체</button>
+      <button class="filter-btn" data-filter="favorite">★ 즐겨찾기</button>
+      <button class="filter-btn" data-filter="new">새 단어</button>
+      <button class="filter-btn" data-filter="learning">학습중</button>
+      <button class="filter-btn" data-filter="done">완료</button>
+    </div>
+
+    <div id="historyList" class="history-list"></div>
+    <div id="emptyState" class="empty-state" style="display:none">번역 기록이 없습니다.</div>
+  </div>
+
+  <div id="quizOverlay" class="quiz-overlay" style="display:none">
+    <div class="quiz-header">
+      <span id="quizProgress" class="quiz-progress"></span>
+      <button id="quizClose" class="btn-ghost">종료</button>
+    </div>
+    <div id="quizCard" class="quiz-card">
+      <div class="card-front">
+        <div id="quizWord" class="quiz-word"></div>
+        <button id="quizSpeak" class="btn-speak-icon" title="발음 듣기">🔊</button>
+        <div class="card-hint">카드를 클릭하여 번역 보기</div>
+      </div>
+      <div class="card-back">
+        <div id="quizTranslation" class="quiz-translation"></div>
+        <div id="quizCtx" class="quiz-context"></div>
+        <div class="quiz-actions">
+          <button id="quizKnow" class="btn-know">알아요 ✓</button>
+          <button id="quizDontKnow" class="btn-dont">모르겠어 ✗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail modal -->
+  <div id="detailModal" class="detail-modal" style="display:none">
+    <div class="detail-backdrop"></div>
+    <div class="detail-box">
+      <button class="detail-close">✕</button>
+      <div id="detailText"  class="detail-text"></div>
+      <div id="detailTrans" class="detail-trans"></div>
+      <div id="detailCtx"   class="detail-ctx"></div>
+      <div id="detailVerb"  class="detail-section"></div>
+      <div id="detailSyn"   class="detail-section"></div>
+    </div>
+  </div>
+
+  <script src="verbs.js"></script>
+  <script src="history.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Translate 설정</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <h1><img src="icons/tuxt.png" class="logo-img" alt="">Quick Translate</h1>
+      <button id="openHistory" class="btn-history">번역 기록 →</button>
+    </div>
+
+    <div class="card">
+      <label class="field-label" for="apiKey">Google Translate API 키</label>
+      <div class="api-key-row">
+        <input
+          type="password"
+          id="apiKey"
+          class="input"
+          placeholder="AIzaSy..."
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button id="apiKeyChange" class="btn-change" style="display:none">변경</button>
+      </div>
+      <p class="hint">
+        <a href="https://console.cloud.google.com/apis/library/translate.googleapis.com" target="_blank" rel="noopener">Google Cloud Console</a>에서
+        Cloud Translation API를 활성화하고 API 키를 발급받으세요.
+      </p>
+    </div>
+
+    <div class="card">
+      <span class="field-label">표시 모드</span>
+      <div class="radio-group">
+        <label class="radio-item">
+          <input type="radio" name="displayMode" value="popup">
+          <div class="radio-content">
+            <span class="radio-title">팝업</span>
+            <span class="radio-desc">선택한 텍스트 근처에 작은 팝업으로 표시</span>
+          </div>
+        </label>
+        <label class="radio-item">
+          <input type="radio" name="displayMode" value="floating">
+          <div class="radio-content">
+            <span class="radio-title">플로팅 윈도우</span>
+            <span class="radio-desc">화면 위에 자유롭게 이동·리사이즈 가능한 창으로 표시</span>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="field-label" for="theme">테마</label>
+      <select id="theme" class="select">
+        <option value="system">시스템 설정</option>
+        <option value="light">라이트</option>
+        <option value="dark">다크</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <label class="field-label" for="autohide">자동 닫힘</label>
+      <select id="autohide" class="select">
+        <option value="2000">2초 후 자동 닫힘</option>
+        <option value="3000">3초 후 자동 닫힘</option>
+        <option value="5000">5초 후 자동 닫힘</option>
+        <option value="10000">10초 후 자동 닫힘</option>
+        <option value="0">안 사라짐 (✕ 버튼으로만 닫기)</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <label class="field-label">투명도</label>
+      <div class="opacity-row">
+        <input type="range" id="opacitySlider" class="slider" min="20" max="100" step="1" value="100">
+        <input type="number" id="opacityNum" class="input opacity-num" min="20" max="100" step="1" value="100">
+        <span class="opacity-unit">%</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="save" class="btn-save">저장</button>
+      <span id="status" class="status"></span>
+    </div>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>
