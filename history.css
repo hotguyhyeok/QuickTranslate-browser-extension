@@ -573,3 +573,20 @@ h1 {
   font-weight: 600;
   cursor: pointer;
 }
+
+.btn-quiz-delete {
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--text-hint);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s;
+}
+
+.btn-quiz-delete:hover {
+  color: var(--delete-hover);
+  border-color: var(--delete-hover);
+}

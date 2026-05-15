@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('퀴즈할 단어가 없습니다.\n학습 상태가 완료가 아닌 단어가 필요합니다.');
       return;
     }
-    quizItems = [...deck];
+    quizItems = [...deck].sort(() => Math.random() - 0.5);
     quizIdx   = 0;
     showCard();
     document.getElementById('quizOverlay').style.display = 'flex';
@@ -286,6 +286,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('quizKnow').addEventListener('click',     (e) => { e.stopPropagation(); updateQuizItem('done'); });
   document.getElementById('quizDontKnow').addEventListener('click', (e) => { e.stopPropagation(); updateQuizItem('learning'); });
+  document.getElementById('quizDelete').addEventListener('click',   (e) => {
+    e.stopPropagation();
+    const item = quizItems[quizIdx];
+    if (!item) return;
+    const idx = allHistory.findIndex(i => i.key === item.key);
+    if (idx !== -1) { allHistory.splice(idx, 1); persist(); }
+    quizItems.splice(quizIdx, 1);
+    if (quizItems.length === 0) { closeQuiz(); update(); return; }
+    if (quizIdx >= quizItems.length) quizIdx = quizItems.length - 1;
+    showCard();
+  });
 
   function updateQuizItem(status) {
     const item = quizItems[quizIdx];

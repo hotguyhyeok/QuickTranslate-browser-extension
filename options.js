@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const opacity = data.opacity !== undefined ? data.opacity : 100;
     opacitySlider.value = opacity;
     opacityNum.value = opacity;
+
   });
 
   function setMaskedState() {

@@ -83,29 +83,48 @@
     if (!qtEnabled) return;
     if (e.detail === 2) return; // handled by dblclick
     if (isInsideUI(e.target)) return;
-    const text = e.detail >= 3
-      ? (getSentenceAtPoint(e.clientX, e.clientY) || getSelectedText())
-      : getSelectedText();
-    if (text) requestTranslation(text, e);
+
+    setTimeout(() => {
+      const text = e.detail >= 3
+        ? (getSentenceAtPoint(e.clientX, e.clientY) || getSelectedText())
+        : getSelectedText();
+      if (text) requestTranslation(text, e);
+    }, 0);
   });
 
   function getSentenceAtPoint(x, y) {
     const range = document.caretRangeFromPoint(x, y);
     if (!range || range.startContainer.nodeType !== Node.TEXT_NODE) return null;
 
-    const text = range.startContainer.textContent;
-    const offset = range.startOffset;
-    const boundary = /[.!?。！？]['"'"\s]/g;
+    const BLOCK = /^(P|LI|TD|TH|DIV|SECTION|ARTICLE|BLOCKQUOTE|H[1-6]|FIGCAPTION|CAPTION)$/;
+    let block = range.startContainer.parentElement;
+    while (block && block !== document.body && !BLOCK.test(block.tagName)) {
+      block = block.parentElement;
+    }
+    if (!block || block === document.body) block = range.startContainer.parentElement;
 
-    let start = 0;
-    let end = text.length;
-    let m;
+    let globalOffset = 0;
+    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+    let node, found = false;
+    while ((node = walker.nextNode()) !== null) {
+      if (node === range.startContainer) {
+        globalOffset += range.startOffset;
+        found = true;
+        break;
+      }
+      globalOffset += node.textContent.length;
+    }
+    if (!found) return null;
+
+    const text = block.textContent;
+    const offset = globalOffset;
+    const boundary = /[.!?。！？]['"'"\s]/g;
+    let start = 0, end = text.length, m;
     while ((m = boundary.exec(text)) !== null) {
       const pos = m.index + 1;
       if (pos <= offset) start = pos;
       else { end = pos; break; }
     }
-
     return text.slice(start, end).trim() || null;
   }
 
