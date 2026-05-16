@@ -272,6 +272,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('quizClose').addEventListener('click', closeQuiz);
 
+  document.getElementById('quizFav').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const item = quizItems[quizIdx];
+    if (!item) return;
+    item.favorite = !item.favorite;
+    e.currentTarget.classList.toggle('is-fav', item.favorite);
+    persist();
+  });
+
   document.getElementById('quizCard').addEventListener('click', () => {
     const card = document.getElementById('quizCard');
     if (card.classList.contains('revealed')) return;
@@ -324,6 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctxEl.textContent   = item.context ? `"${item.context}"` : '';
     ctxEl.style.display = item.context ? 'block' : 'none';
     document.getElementById('quizProgress').textContent = `${quizIdx + 1} / ${quizItems.length}`;
+    document.getElementById('quizFav').classList.toggle('is-fav', !!item.favorite);
   }
 
   function closeQuiz() {

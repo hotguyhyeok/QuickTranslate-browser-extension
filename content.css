@@ -147,7 +147,7 @@
   font-size: 13.5px;
   color: var(--qt-text);
   word-break: break-word;
-  white-space: pre-wrap;
+  white-space: normal;
   padding-right: 20px; /* space for X button */
 }
 
