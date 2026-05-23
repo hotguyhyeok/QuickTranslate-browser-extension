@@ -98,7 +98,28 @@ Parse this and respond only in the format for the given mode.`;
   chrome.storage.local.get(['translationHistory'], (data) => {
     const all = data.translationHistory || [];
     studyItems = all.filter(i => !isParagraph(i.text));
-    populateWordSelect();
+
+    const params = new URLSearchParams(window.location.search);
+    const initWord     = params.get('word');
+    const initMode     = params.get('mode');
+    const initSentence = params.get('sentence');
+
+    populateWordSelect(initWord || undefined);
+
+    if (initMode && MODE_CONFIG[initMode]) {
+      document.querySelectorAll('.mode-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.mode === initMode);
+      });
+      currentMode = initMode;
+      applyModeUI();
+    }
+
+    if (initSentence && currentMode === 'FREECHAT') {
+      answerInputEl.value = initSentence;
+      answerInputEl.style.height = 'auto';
+      answerInputEl.style.height = Math.min(answerInputEl.scrollHeight, 120) + 'px';
+      answerInputEl.focus();
+    }
   });
 
   function applyTheme(theme) {
@@ -115,14 +136,21 @@ Parse this and respond only in the format for the given mode.`;
     return text.trim().split(/\s+/).length <= 2;
   }
 
-  function populateWordSelect() {
+  function populateWordSelect(selectValue) {
+    const query = (document.getElementById('wordSearch')?.value || '').toLowerCase().trim();
     const items = [...studyItems]
       .filter(i => isWord(i.text))
+      .filter(i => !query || i.text.toLowerCase().includes(query) || i.translation.toLowerCase().includes(query))
       .sort((a, b) => a.text.localeCompare(b.text));
     wordSelectEl.innerHTML = items.length
       ? items.map(i => `<option value="${esc(i.text)}">${esc(i.text)} — ${esc(i.translation)}</option>`).join('')
       : '<option value="" disabled>단어가 없습니다</option>';
+    if (selectValue) wordSelectEl.value = selectValue;
   }
+
+  document.getElementById('wordSearch')?.addEventListener('input', () => {
+    populateWordSelect();
+  });
 
   function renderModelSelect() {
     const sel = document.getElementById('modelSelect');

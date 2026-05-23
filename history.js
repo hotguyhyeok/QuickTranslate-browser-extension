@@ -237,6 +237,14 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    const aiLearnBtn = document.getElementById('detailAiLearnBtn');
+    aiLearnBtn.onclick = () => {
+      const url = new URL(chrome.runtime.getURL('ai-learning.html'));
+      url.searchParams.set('mode', 'FREECHAT');
+      url.searchParams.set('sentence', item.text);
+      chrome.tabs.create({ url: url.toString() });
+    };
+
     detailModal.style.display = 'flex';
   }
 

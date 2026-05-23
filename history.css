@@ -306,10 +306,12 @@ html.qt-dark .filter-btn.active .filter-count { opacity: 1; }
 
 html.qt-dark .btn-edit-trans,
 html.qt-dark .btn-icon { color: var(--text-2); }
+html.qt-dark .btn-fav.is-fav { color: var(--gold); }
 
 @media (prefers-color-scheme: dark) {
   html:not(.qt-light):not(.qt-dark) .btn-edit-trans,
   html:not(.qt-light):not(.qt-dark) .btn-icon { color: var(--text-2); }
+  html:not(.qt-light):not(.qt-dark) .btn-fav.is-fav { color: var(--gold); }
 }
 
 .trans-edit-input {
@@ -573,6 +575,28 @@ html.qt-dark .wrong-badge { background: #2d0b0b; }
   padding-top: 12px;
   border-top: 1px solid var(--border);
 }
+
+/* ── Detail actions ── */
+.detail-actions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-ai-learn {
+  padding: 9px 18px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-ai-learn:hover { opacity: 0.85; }
 
 /* ── Quiz overlay ── */
 .quiz-overlay {

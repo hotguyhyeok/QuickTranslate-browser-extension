@@ -378,6 +378,21 @@ body {
 }
 .word-chip:focus { border-color: var(--accent); }
 
+.config-word-search-row { margin-bottom: 8px; }
+
+.word-search-input {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--text-1);
+  background: var(--surface);
+  border: 1.5px solid var(--input-bd);
+  border-radius: var(--r);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.word-search-input:focus { border-color: var(--accent); }
+
 .btn-run {
   padding: 7px 18px;
   background: var(--btn);
