@@ -25,6 +25,22 @@ document.addEventListener('DOMContentLoaded', () => {
   function update() {
     filtered = buildFiltered();
     renderList();
+    renderStats();
+  }
+
+  function renderStats() {
+    const counts = {
+      all:      allHistory.length,
+      new:      allHistory.filter(i => i.status === 'new').length,
+      learning: allHistory.filter(i => i.status === 'learning').length,
+      done:     allHistory.filter(i => i.status === 'done').length,
+      favorite: allHistory.filter(i => i.favorite).length,
+      wrong:    allHistory.filter(i => i.wrongCount > 0).length,
+    };
+    document.querySelectorAll('.filter-count[data-count]').forEach(el => {
+      const n = counts[el.dataset.count];
+      el.textContent = n !== undefined ? n : '';
+    });
   }
 
   function buildFiltered() {
@@ -36,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     }
     if (currentFilter === 'favorite') items = items.filter(i => i.favorite);
+    else if (currentFilter === 'wrong') items = items.filter(i => i.wrongCount > 0);
     else if (currentFilter !== 'all') items = items.filter(i => i.status === currentFilter);
 
     if (currentSort === 'frequency') items.sort((a, b) => b.count - a.count);
@@ -73,8 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
     el.innerHTML = `
       <div class="item-top">
         <div class="item-main">
-          <div class="item-text">${esc(item.text)}</div>
-          <div class="item-translation">${esc(item.translation)}</div>
+          <div class="item-text">${esc(item.text)}${item.wrongCount > 0 ? `<span class="wrong-badge">오답 ${item.wrongCount}</span>` : ''}</div>
+          <div class="item-trans-row"></div>
           ${item.context ? `<div class="item-context">"${esc(item.context)}"</div>` : ''}
           <div class="item-date">${fmtDate(item.lastSeen)}</div>
         </div>
@@ -92,6 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       ${bottomHTML}
     `;
+
+    renderTransRow(el.querySelector('.item-trans-row'), item);
 
     el.addEventListener('click', (e) => {
       if (e.target.closest('.btn-icon, .btn-status')) return;
@@ -162,8 +181,37 @@ document.addEventListener('DOMContentLoaded', () => {
   detailClose.addEventListener('click', closeDetail);
 
   function openDetail(item) {
-    document.getElementById('detailText').textContent  = item.text;
-    document.getElementById('detailTrans').textContent = item.translation;
+    document.getElementById('detailText').textContent = item.text;
+    const detailTransEl = document.getElementById('detailTrans');
+    detailTransEl.textContent = item.translation;
+    detailTransEl.style.cursor = 'text';
+    detailTransEl.title = '클릭하여 번역 수정';
+    detailTransEl.onclick = () => {
+      const cur = item.translation;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = cur;
+      input.className = 'detail-trans-input';
+      detailTransEl.replaceWith(input);
+      input.focus();
+      input.setSelectionRange(0, input.value.length);
+      const finalize = () => {
+        const newVal = input.value.trim();
+        if (newVal && newVal !== cur) {
+          item.translation = newVal;
+          item.customTranslation = true;
+          persist();
+        }
+        const restored = document.createElement('div');
+        restored.id = 'detailTrans';
+        restored.className = 'detail-trans';
+        restored.textContent = item.translation;
+        input.replaceWith(restored);
+        openDetail(item);
+      };
+      input.addEventListener('blur', finalize);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { input.blur(); } if (e.key === 'Escape') { input.value = cur; input.blur(); } });
+    };
 
     const ctxEl = document.getElementById('detailCtx');
     ctxEl.textContent = item.context ? `"${item.context}"` : '';
@@ -237,6 +285,10 @@ document.addEventListener('DOMContentLoaded', () => {
       currentFilter = btn.dataset.filter;
       update();
     });
+  });
+
+  document.getElementById('aiLearnBtn').addEventListener('click', () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('ai-learning.html') });
   });
 
   document.getElementById('clearBtn').addEventListener('click', () => {
@@ -339,6 +391,39 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeQuiz() {
     window.speechSynthesis.cancel();
     document.getElementById('quizOverlay').style.display = 'none';
+  }
+
+  function renderTransRow(transRow, item) {
+    transRow.innerHTML = `
+      <div class="item-translation">${esc(item.translation)}${item.customTranslation ? '<span class="custom-badge">수정됨</span>' : ''}</div>
+      <button class="btn-icon btn-edit-trans" title="번역 수정">✎</button>`;
+    transRow.querySelector('.btn-edit-trans').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const current = item.translation;
+      transRow.innerHTML = `
+        <input class="trans-edit-input" type="text" value="${esc(current)}">
+        <button class="btn-trans-save">저장</button>
+        <button class="btn-trans-cancel">취소</button>`;
+      const input = transRow.querySelector('.trans-edit-input');
+      input.focus();
+      input.setSelectionRange(0, input.value.length);
+      const commit = () => {
+        const newVal = input.value.trim();
+        if (newVal && newVal !== current) {
+          item.translation = newVal;
+          item.customTranslation = true;
+          persist();
+        }
+        renderTransRow(transRow, item);
+      };
+      const cancel = () => renderTransRow(transRow, item);
+      transRow.querySelector('.btn-trans-save').addEventListener('click', commit);
+      transRow.querySelector('.btn-trans-cancel').addEventListener('click', cancel);
+      input.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') commit();
+        if (ev.key === 'Escape') cancel();
+      });
+    });
   }
 
   function esc(str) {

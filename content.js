@@ -51,6 +51,14 @@
   let currentRequestId = 0;
   let contextAlive = true;
 
+  // in-memory map: key → custom translation (loaded from storage on init)
+  const customTranslationsMap = {};
+  chrome.storage.local.get(['translationHistory'], (d) => {
+    (d.translationHistory || []).forEach(item => {
+      if (item.customTranslation) customTranslationsMap[item.key] = item.translation;
+    });
+  });
+
   function invalidate() {
     contextAlive = false;
     if (popupEl) popupEl.style.display = 'none';
@@ -161,7 +169,9 @@
             show({ error: response.error }, event);
             return;
           }
-          show({ original: text, translated: response.translation }, event);
+          const key = text.toLowerCase().trim();
+          const display = customTranslationsMap[key] || response.translation;
+          show({ original: text, translated: display }, event);
           saveHistory(text, response.translation, response.detectedLang, context);
         } catch { invalidate(); }
       });
@@ -201,7 +211,9 @@
           if (idx !== -1) {
             history[idx].count++;
             history[idx].lastSeen = now;
-            history[idx].translation = translation;
+            if (!history[idx].customTranslation) {
+              history[idx].translation = translation;
+            }
             if (context) history[idx].context = context;
             const [item] = history.splice(idx, 1);
             history.unshift(item);
@@ -219,6 +231,23 @@
         } catch { invalidate(); }
       });
     } catch { invalidate(); }
+  }
+
+  function saveCustomTranslation(text, newTranslation) {
+    if (!contextAlive) return;
+    const key = text.toLowerCase().trim();
+    customTranslationsMap[key] = newTranslation; // 즉시 반영 (storage 비동기 대기 없음)
+    chrome.storage.local.get(['translationHistory'], (data) => {
+      try {
+        const history = data.translationHistory || [];
+        const item = history.find(i => i.key === key);
+        if (item) {
+          item.translation = newTranslation;
+          item.customTranslation = true;
+          chrome.storage.local.set({ translationHistory: history });
+        }
+      } catch { invalidate(); }
+    });
   }
 
   function show(data, event) {
@@ -419,6 +448,7 @@
       body.innerHTML = `<div class="qt-error">${esc(data.error)}</div>`;
       return;
     }
+
     body.innerHTML = `<div class="qt-result">${esc(data.translated)}</div>`;
   }
 

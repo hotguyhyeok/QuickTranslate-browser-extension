@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 튜터 — Quick Translate</title>
+  <link rel="stylesheet" href="ai-learning.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <button id="backBtn" class="topbar-back">← 번역 기록</button>
+    <span class="topbar-title">AI 튜터</span>
+    <div class="topbar-end">
+      <select id="modelSelect" class="model-chip"></select>
+      <span id="modelStatus" class="fallback-badge"></span>
+    </div>
+  </header>
+
+  <!-- API key setup banner -->
+  <div id="setupCard" class="setup-banner">
+    <div id="setupExpanded">
+      <div class="setup-top">
+        <span class="setup-label">Groq API 키 필요</span>
+        <a href="https://console.groq.com/keys" target="_blank" rel="noopener" class="setup-link">무료 발급 →</a>
+      </div>
+      <div class="setup-row">
+        <input type="password" id="apiKeyInput" class="input" placeholder="gsk_..." autocomplete="off" spellcheck="false">
+        <button id="apiKeySave" class="btn-primary">저장</button>
+      </div>
+    </div>
+    <div id="setupCollapsed" style="display:none" class="setup-saved-row">
+      <span class="setup-ok">Groq API 키 설정됨 ✓</span>
+      <button id="changeKeyBtn" class="btn-link">변경</button>
+    </div>
+  </div>
+
+  <!-- Mode tabs -->
+  <nav class="mode-nav">
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="REVIEW">복습</button>
+      <button class="mode-tab" data-mode="SYNONYMS">유의어</button>
+      <button class="mode-tab" data-mode="EXAMPLES">예문</button>
+      <button class="mode-tab" data-mode="QUIZ">퀴즈</button>
+      <button class="mode-tab" data-mode="FREECHAT">자유 대화</button>
+    </div>
+  </nav>
+
+  <!-- Config strip -->
+  <div id="configCount" class="config-strip">
+    <div id="executeRow" class="config-inner">
+      <select id="scopeSelect" class="scope-select">
+        <option value="active">학습 중</option>
+        <option value="all">전체</option>
+      </select>
+      <span class="config-hint">단어 수</span>
+      <input type="number" id="countInput" class="count-input" value="5" min="1" max="20">
+      <button id="countAllBtn" class="btn-count-all">전체</button>
+      <button id="executeBtn" class="btn-run">복습 시작</button>
+    </div>
+  </div>
+  <div id="configWord" class="config-strip" style="display:none">
+    <div class="config-inner">
+      <select id="wordSelect" class="word-chip"></select>
+      <button id="executeBtnWord" class="btn-run">분석</button>
+    </div>
+  </div>
+
+  <!-- Main scrollable area -->
+  <main class="main-area" id="responseArea">
+    <div id="responsePlaceholder" class="empty-state">
+      <div class="empty-glyph">✦</div>
+      <p class="empty-title">AI 튜터와 학습을 시작하세요</p>
+      <p class="empty-desc">히스토리 단어를 기반으로 복습 · 퀴즈 · 자유 대화를 진행합니다</p>
+    </div>
+    <div id="responseContent" class="chat-body"></div>
+  </main>
+
+  <!-- Bottom dock -->
+  <div class="bottom-dock">
+    <div id="answerArea" class="chat-bar" style="display:none">
+      <textarea id="answerInput" class="chat-input" placeholder="답변을 입력하세요..." rows="1"></textarea>
+      <button id="submitAnswer" class="btn-send">↑</button>
+    </div>
+    <div id="resetArea" class="reset-row" style="display:none">
+      <button id="resetBtn" class="btn-restart">↺ 새 학습 시작</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Wrong answer modal -->
+<div id="wrongModal" class="modal-overlay" style="display:none">
+  <div class="modal-scrim"></div>
+  <div class="modal-sheet">
+    <h3 class="modal-title">틀린 단어를 선택하세요</h3>
+    <p class="modal-desc">선택한 단어의 오답 횟수가 기록됩니다.</p>
+    <div id="wrongList" class="wrong-list"></div>
+    <div class="modal-actions">
+      <button id="wrongConfirm" class="btn-primary">기록</button>
+      <button id="wrongSkip" class="btn-ghost">건너뛰기</button>
+    </div>
+  </div>
+</div>
+
+<script src="ai-learning.js"></script>
+</body>
+</html>
